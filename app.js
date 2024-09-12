@@ -1,24 +1,17 @@
 require('dotenv').config({ path: './.env' });
 const express = require('express');
-const { Pool } = require('pg');
 const app = express();
 const port = process.env.PORT;
 const fs = require('fs');
 const path = require('path');
+const db = require('./postgres/db');
+app.use(express.json());
 
-// Create a new pool instance
-const pool = new Pool({
-  user: process.env.POSTGRES_USERNAME,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DATABASE_NAME,
-  password: process.env.POSTGRES_PASSWORD,
-  port: process.env.POSTGRES_PORT,
-});
 
 app.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT NOW()');
-    res.send(`Current time from Postgres: ${result.rows[0].now}`);
+    const result = await db.query('SELECT NOW()');
+    res.send(`Current time from Postgres: ${result.rows[0].now} ${__dirname}`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Something went wrong');
@@ -28,14 +21,45 @@ app.get('/', async (req, res) => {
 app.get('/setup', async (req, res) => {
   try {
     const createTableQuery = fs.readFileSync(path.join(__dirname, 'queries', 'createTables.sql'), 'utf8');
-    const result = await pool.query(createTableQuery);
+    const result = await db.query(createTableQuery);
     res.send(`Current time from Postgres: ${result.rows[0]}`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Something went wrong');
+  } catch (error) {
+    res.status(400).json({ message: error?.message });
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+// docker-compose up --build
+// docker ps
+// docker exec -it </container_id> sh
+// psql -U </username> -h <host>
+// \c mydatabase
+// select * from "user";
+app.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req?.body;
+    if (!username) throw Error("Username not found");
+    if (!password) throw Error("Password not found");
+
+    // length
+    if (username?.length < 3 && username?.length > 12) throw Error("Username length must be between 3 to 12 characters long");
+    if (password?.length < 3 && password?.length > 12) throw Error("password length must be between 3 to 12 characters long");
+
+    const insertQuery = `INSERT INTO "user" (username, password) VALUES($1, $2) RETURNING *`;
+    const output = await db.query(insertQuery, [username, password]);
+    console.log("output=>", output);
+    const user = output?.rows?.[0];
+    // [{'username':'virat'}]
+    res.status(200).json({ message: `User ${user?.username} registered successfully`});
+  } catch (error) {
+    res.status(400).json({ message: error?.message });
+  }
+});
+
+db.connect().then(() => {
+  app.listen(port, () => {
+    console.log(`Connected to Database and Server is running on port ${port}`);
+  });
+}).catch(error => {
+  console.log("Error: ", error?.message);
 });
