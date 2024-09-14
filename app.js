@@ -4,19 +4,20 @@ const app = express();
 const port = process.env.PORT;
 const fs = require('fs');
 const path = require('path');
-const db = require('./postgres/db');
+const db = require('./src/postgres/db');
 app.use(express.json());
+const authenticationRoutes = require('./src/routes/authenticationRoutes')
 
 
-app.get('/', async (req, res) => {
-  try {
-    const result = await db.query('SELECT NOW()');
-    res.send(`Current time from Postgres: ${result.rows[0].now} ${__dirname}`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Something went wrong');
-  }
-});
+// app.get('/', async (req, res) => {
+//   try {
+//     const result = await db.query('SELECT NOW()');
+//     res.send(`Current time from Postgres: ${result.rows[0].now} ${__dirname}`);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send('Something went wrong');
+//   }
+// });
 
 app.get('/setup', async (req, res) => {
   try {
@@ -28,6 +29,8 @@ app.get('/setup', async (req, res) => {
   }
 });
 
+// Routes
+app.use('/api/user', authenticationRoutes)
 
 // docker-compose up --build
 // docker ps
