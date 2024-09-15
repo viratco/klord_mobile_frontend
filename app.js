@@ -7,7 +7,8 @@ const path = require('path');
 const db = require('./src/postgres/db');
 app.use(express.json());
 const authenticationRoutes = require('./src/routes/authenticationRoutes')
-
+const postRoutes = require('./src/routes/postRoutes');
+const validation = require('./src/middleware/validation');
 
 // app.get('/', async (req, res) => {
 //   try {
@@ -30,7 +31,8 @@ app.get('/setup', async (req, res) => {
 });
 
 // Routes
-app.use('/api/user', authenticationRoutes)
+app.use('/api/user', authenticationRoutes);
+app.use('/api/post', validation, postRoutes);
 
 // docker-compose up --build
 // docker ps
@@ -53,7 +55,7 @@ app.post('/register', async (req, res) => {
     console.log("output=>", output);
     const user = output?.rows?.[0];
     // [{'username':'virat'}]
-    res.status(200).json({ message: `User ${user?.username} registered successfully`});
+    res.status(200).json({ message: `User ${user?.username} registered successfully` });
   } catch (error) {
     res.status(400).json({ message: error?.message });
   }
