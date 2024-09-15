@@ -1,30 +1,31 @@
 const db = require('../postgres/db');
 const bcrypt = require("bcrypt");
 const createToken = require('../functions/createToken');
+const { v4: uuidv4 } = require('uuid');
 
 const register = async (req, res) => {
     try {
-        const {username, password} = req?.body
-        if(!username) throw Error("Username not found");
-        if(!password) throw Error("Password not found");
-
+        const { username, password } = req?.body
+        const user_id = uuidv4();
+        if (!username) throw Error("Username not found");
+        if (!password) throw Error("Password not found");
         const hash = await bcrypt.hash(password, 10);
 
-        const insertValue = `INSERT INTO "user" (username, password) VALUES($1, $2) RETURNING *`;
-        const output = await db.query(insertValue, [username, hash]);
+        const insertValue = `INSERT INTO "user" (user_id, username, password) VALUES($1, $2, $3) RETURNING *`;
+        const output = await db.query(insertValue, [user_id, username, hash]);
         const user = output?.rows?.[0];
-        res.status(200).json({message: `User ${user?.username} is registered successfully`})
+        res.status(200).json({ message: `User ${user?.username} is registered successfully` })
     } catch (error) {
-        res.status(400).json({message: error?.message})
+        res.status(400).json({ message: error?.message })
     }
 }
 
-const login = async(req, res) => {
+const login = async (req, res) => {
     try {
-        const {username, password} = req?.body
-        
-        if(!username) throw Error("Username not found");
-        if(!password) throw Error("Password not found");
+        const { username, password } = req?.body
+
+        if (!username) throw Error("Username not found");
+        if (!password) throw Error("Password not found");
 
         const loginQuery = `SELECT * FROM "user" WHERE username=$1`;
         const output = await db.query(loginQuery, [username]);
@@ -37,8 +38,8 @@ const login = async(req, res) => {
         const token = await createToken(user);
         res.status(200).json({ token })
     } catch (error) {
-        res.status(400).json({message: error?.message})
+        res.status(400).json({ message: error?.message })
     }
 }
 
-module.exports = {register, login}
+module.exports = { register, login }
