@@ -18,7 +18,80 @@ const createPost = async (req, res) => {
   }
 }
 
+// Fetch all post
+const fetchPost = async (req, res) => {
+  try {
+    const fetchPost = `SELECT * FROM "post"`;
+    const queryOutput = await db.query(fetchPost);
+    const fetchedPost = queryOutput?.rows;
+    res.status(200).json({ code: 200, data: fetchedPost });
+  } catch (error) {
+    res.status(400).json({ code: 400, message: error?.message });
+  }
+};
+
+// Update post
+const updatePost = async (req, res) => {
+  try {
+    const { id } = req?.params;
+    const { title, description, tags } = req?.body;
+
+    // Validation
+    if (!title) throw new Error("Title is required");
+    if (!description) throw new Error("Description is required");
+    if (!tags) throw new Error("Tags is required");
+
+    const updateQuery = `UPDATE "post" SET title=$1, description=$2, tags=$3 WHERE id=$4 RETURNING *`;
+    const queryOutput = await db.query(updateQuery, [
+      title,
+      description,
+      tags,
+      id,
+    ]);
+    const updatedPost = queryOutput?.rows[0]; 
+
+    res
+      .status(200)
+      .json({
+        code: 200,
+        message: "Post updated successfully",
+        data: updatedPost,
+      });
+  } catch (error) {
+    res.status(400).json({ code: 400, message: error.message });
+  }
+};
+
+// Fet single post
+const fetchSinglePost = async (req, res) => {
+    try {
+        const {id} = req?.params;
+        const fetchSinglePostQUery = `SELECT * FROM "post" WHERE id=$1`;
+        const queryOutput = await db.query(fetchSinglePostQUery, [id]);
+        const fetchSinglePost = queryOutput?.rows;
+        res.status(200).json({code:200, data:fetchSinglePost});
+    } catch (error) {
+        res.status(400).json({code:400, message:error?.message})
+    }
+}
+
+// Delete post
+const deletePost = async (req, res) => {
+    try {
+        const {id} = req?.params
+        const deletePostQuery = `DELETE FROM "post" WHERE id=$1 RETURNING *`;
+        const queryOutput = await db.query(deletePostQuery,[id]);
+        const deletePost = queryOutput?.rows?.[0];
+        res.status(200).json({code:200, data:deletePost})
+    } catch (error) {
+        res.status(400).json({code:400, message:error?.message})
+    }
+}
 
 module.exports = {
-  createPost
+  createPost,
+  fetchPost,
+  updatePost,
+  fetchSinglePost,
+  deletePost
 }
