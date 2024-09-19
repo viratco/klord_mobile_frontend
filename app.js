@@ -8,6 +8,7 @@ const db = require('./src/postgres/db');
 app.use(express.json());
 const authenticationRoutes = require('./src/routes/authenticationRoutes')
 const postRoutes = require('./src/routes/postRoutes');
+const solutionRoutes = require('./src/routes/solutionRoutes');
 const validation = require('./src/middleware/validation');
 
 // app.get('/', async (req, res) => {
@@ -33,6 +34,7 @@ app.get('/setup', async (req, res) => {
 // Routes
 app.use('/api/user', authenticationRoutes);
 app.use('/api/post', validation, postRoutes);
+app.use('/api/solution', validation, solutionRoutes);
 
 // docker-compose up --build
 // docker ps
