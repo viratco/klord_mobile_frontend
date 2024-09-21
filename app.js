@@ -1,5 +1,6 @@
 require('dotenv').config({ path: './.env' });
 const express = require('express');
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT;
 const fs = require('fs');
@@ -9,6 +10,7 @@ app.use(express.json());
 const authenticationRoutes = require('./src/routes/authenticationRoutes')
 const postRoutes = require('./src/routes/postRoutes');
 const solutionRoutes = require('./src/routes/solutionRoutes');
+const voteRoutes = require("./src/routes/voteRoute");
 const validation = require('./src/middleware/validation');
 
 // app.get('/', async (req, res) => {
@@ -20,6 +22,8 @@ const validation = require('./src/middleware/validation');
 //     res.status(500).send('Something went wrong');
 //   }
 // });
+
+app.use(cors({ origin: [5173]}));
 
 app.get('/setup', async (req, res) => {
   try {
@@ -35,6 +39,7 @@ app.get('/setup', async (req, res) => {
 app.use('/api/user', authenticationRoutes);
 app.use('/api/post', validation, postRoutes);
 app.use('/api/solution', validation, solutionRoutes);
+app.use('/api/vote', validation, voteRoutes);
 
 // docker-compose up --build
 // docker ps
