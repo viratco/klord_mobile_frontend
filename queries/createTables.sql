@@ -26,11 +26,40 @@ CREATE TABLE "solution" (
     last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
 );
 
-CREATE TABLE "ratings" (
+-- CREATE TABLE "ratings" (
+--     id SERIAL PRIMARY KEY,
+--     post_id INT REFERENCES solution(id) ON DELETE CASCADE,
+--     user_id INT NOT NULL,  -- Assuming you have a users table to track which user voted
+--     vote_type VARCHAR(10) CHECK (vote_type IN ('upvote', 'downvote')),
+--     voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     UNIQUE (post_id, user_id)  -- Ensures each user can only vote once per post
+-- );
+
+CREATE TABLE "vote" (
     id SERIAL PRIMARY KEY,
-    post_id INT REFERENCES solution(id) ON DELETE CASCADE,
-    user_id INT NOT NULL,  -- Assuming you have a users table to track which user voted
+    solution_id INT REFERENCES solution(id) ON DELETE CASCADE,
+    created_by_user_id VARCHAR(255) NOT NULL,
     vote_type VARCHAR(10) CHECK (vote_type IN ('upvote', 'downvote')),
     voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (post_id, user_id)  -- Ensures each user can only vote once per post
+    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
 );
+
+
+
+-- CREATE TABLE "upvote" (
+--     id SERIAL PRIMARY KEY,
+--     solution_id INT REFERENCES solution(id) ON DELETE CASCADE,
+--     created_by_user_id VARCHAR(255) NOT NULL,
+--     vote_type VARCHAR(10) CHECK (vote_type IN ('upvote')),
+--     voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     UNIQUE (solution_id, created_by_user_id)
+-- );
+
+-- CREATE TABLE "downvote" (
+--     id SERIAL PRIMARY KEY,
+--     solution_id INT REFERENCES solution(id) ON DELETE CASCADE,
+--     created_by_user_id VARCHAR(255) NOT NULL,
+--     vote_type VARCHAR(10) CHECK (vote_type IN ('downvote')),
+--     voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     UNIQUE (solution_id, created_by_user_id)
+-- );

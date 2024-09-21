@@ -1,6 +1,6 @@
 
 const express = require('express');
-const { createPost, fetchPost, updatePost, fetchSinglePost, deletePost } = require('../controllers/postController');
+const { createPost, fetchPost, updatePost, fetchSinglePost, deletePost, fetchSinglePostWithSolution } = require('../controllers/postController');
 
 
 const router = express.Router();
@@ -18,6 +18,9 @@ router.get('/:id', fetchSinglePost)
 
 // Delete post
 router.delete('/:id', deletePost)
+
+// Fetch post with solution
+router.get('/post-solution/:id', fetchSinglePostWithSolution)
 
 
 module.exports = router;
