@@ -1,5 +1,6 @@
 const db = require("../postgres/db");
 const postTable = require("../constants/postTable");
+const countVotesBySolutionIds = require("../functions/countVotesBySolutionIds");
 
 const createPost = async (req, res) => {
   // write a query to insert post in psql
@@ -97,23 +98,34 @@ const fetchSinglePostWithSolution = async (req, res) => {
     let { id } = req.params;
     const fetchPostWithSolution = `
      SELECT 
-  post.id, 
-  post.created_by_user_id, 
-  post.title, 
-  post.description, 
-  post.tags, 
-  post.created_at, 
-  post.last_modified, 
-  COALESCE(JSON_AGG(JSON_BUILD_OBJECT('id', solution.id, 'description', solution.description)) FILTER (WHERE solution.id IS NOT NULL), '[]'::json) AS solutions
-FROM "post"
-LEFT JOIN "solution" ON post.id = solution.post_id
-WHERE post.id = $1
-GROUP BY post.id;
+       post.id, 
+       post.created_by_user_id, 
+       post.title, 
+       post.description, 
+       post.tags, 
+       post.created_at, 
+       post.last_modified, 
+       COALESCE(JSON_AGG(JSON_BUILD_OBJECT('id', solution.id, 'description', solution.description)) FILTER (WHERE solution.id IS NOT NULL), '[]'::json) AS solutions
+       FROM "post"
+       LEFT JOIN "solution" ON post.id = solution.post_id
+       WHERE post.id = $1
+       GROUP BY post.id;
     `;
 
     const queryOutput = await db.query(fetchPostWithSolution, [id]);
-    const postWithSolution = queryOutput.rows;
+    const postWithSolution = queryOutput?.rows?.[0];
+    const solution_ids = postWithSolution?.solutions?.map((solution) => solution?.id);
+    
+    const votesBySolutions = await countVotesBySolutionIds(solution_ids);
+    // const 
+    const solutions = postWithSolution?.solutions?.map((solution) => {
+      const hasVoteIndex = votesBySolutions.findIndex((item) => item?.solution_id === solution?.id);
+      return { ...solution, ...votesBySolutions?.[hasVoteIndex]}
+    });
 
+    postWithSolution.solutions = solutions
+
+    
     res.status(200).json({ code: 200, data: postWithSolution });
   } catch (error) {
     res.status(400).json({ code: 400, message: error.message });
