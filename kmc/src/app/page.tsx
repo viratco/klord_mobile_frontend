@@ -190,8 +190,6 @@ export default function Home() {
           </div>
         </div>
         <div className="flex gap-4 items-center text-[#4C0604]">
-          <Link href="/events" className="hover:underline font-medium hover:text-[#5C0A0A]">EVENTS</Link>
-          <span>|</span>
           <a href="/register" className="hover:underline">REGISTER</a>
           <span>|</span>
           <a href="/login" className="hover:underline">LOGIN</a>
@@ -519,18 +517,6 @@ export default function Home() {
               </Link>
             ))}
           </div>
-          
-          <div className="text-center mt-10">
-            <a 
-              href="/announcements" 
-              className="inline-flex items-center px-6 py-3 border border-[#4C0604] text-[#4C0604] font-medium rounded-md hover:bg-[#4C0604] hover:text-white transition-colors duration-200"
-            >
-              View All Announcements
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </a>
-          </div>
         </div>
       </div>
       
@@ -538,49 +524,88 @@ export default function Home() {
       <div className="w-full py-20 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <h3 className="text-3xl font-bold text-center mb-16">Featured Alumni</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-12 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 justify-items-center">
             {[
-              { name: 'Alex Johnson', role: 'Developer', company: 'TechCorp', gradYear: '2015', image: '/alumni1.jpg' },
-              { name: 'Sarah Williams', role: 'Marketing', company: 'BrandWorks', gradYear: '2012', image: '/alumni2.jpg' },
-              { name: 'Michael Chen', role: 'Data Science', company: 'DataInsights', gradYear: '2018', image: '/alumni3.jpg' },
-              { name: 'Emily Rodriguez', role: 'UX Design', company: 'DesignHub', gradYear: '2017', image: '/alumni4.jpg' },
-              { name: 'David Kim', role: 'Product', company: 'InnoTech', gradYear: '2016', image: '/alumni5.jpg' },
+              { 
+                name: 'Dr. Ananya Sharma', 
+                role: 'Senior Research Scientist', 
+                company: 'Indian Institute of Science', 
+                gradYear: '2008', 
+                image: 'https://randomuser.me/api/portraits/women/32.jpg' 
+              },
+              { 
+                name: 'Rahul Mehta', 
+                role: 'Software Engineering Lead', 
+                company: 'Microsoft India', 
+                gradYear: '2012', 
+                image: 'https://randomuser.me/api/portraits/men/45.jpg' 
+              },
+              { 
+                name: 'Priya Patel', 
+                role: 'Investment Banker', 
+                company: 'Goldman Sachs', 
+                gradYear: '2015', 
+                image: 'https://randomuser.me/api/portraits/women/68.jpg' 
+              },
+              { 
+                name: 'Arjun Khanna', 
+                role: 'Marketing Director', 
+                company: 'Tata Group', 
+                gradYear: '2010', 
+                image: 'https://randomuser.me/api/portraits/men/22.jpg' 
+              },
+              { 
+                name: 'Neha Gupta', 
+                role: 'Senior Consultant', 
+                company: 'McKinsey & Company', 
+                gradYear: '2017', 
+                image: 'https://randomuser.me/api/portraits/women/54.jpg' 
+              },
             ].map((alum, index) => (
-              <div key={index} className="group relative text-center">
-                <div className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white shadow-lg hover:border-[#4C0604] transition-all duration-300 transform hover:scale-105">
-                  <Image
-                    src={alum.image}
-                    alt={alum.name}
-                    width={160}
-                    height={160}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-48 bg-white p-3 rounded-lg shadow-xl z-10">
-                  <h4 className="font-bold text-gray-900">{alum.name}</h4>
-                  <p className="text-sm text-[#4C0604]">{alum.role}</p>
-                  <p className="text-xs text-gray-600">{alum.company}</p>
-                  <p className="text-xs text-gray-500 mt-1">Class of {alum.gradYear}</p>
+              <div key={index} className="relative">
+                <div className="group relative w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 mx-auto mb-4">
+                  <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-lg transition-all duration-300 group-hover:border-[#4C0604] group-hover:scale-105">
+                    <Image
+                      src={alum.image}
+                      alt={alum.name}
+                      width={160}
+                      height={160}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to a default avatar if the image fails to load
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(alum.name)}&background=4C0604&color=fff&size=256`;
+                      }}
+                    />
+                  </div>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-48 bg-white p-3 rounded-lg shadow-xl z-10">
+                    <h4 className="font-bold text-gray-900">{alum.name}</h4>
+                    <p className="text-sm text-[#4C0604]">{alum.role}</p>
+                    <p className="text-xs text-gray-600">{alum.company}</p>
+                    <p className="text-xs text-gray-500 mt-1">Class of {alum.gradYear}</p>
+                  </div>
                 </div>
               </div>
             ))}
             
             {/* Join Network Circle */}
             <div className="flex flex-col items-center justify-center">
-              <div className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full border-2 border-dashed border-[#4C0604] flex items-center justify-center flex-col p-6 text-center cursor-pointer hover:bg-[#4C0604] hover:bg-opacity-5 transition-colors duration-300">
-                <div className="bg-[#4C0604] rounded-full p-3 mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+              <div className="relative w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 group">
+                <div className="w-full h-full rounded-full border-2 border-dashed border-[#4C0604] flex items-center justify-center flex-col p-6 text-center cursor-pointer hover:bg-[#4C0604] transition-all duration-300">
+                  <div className="bg-[#4C0604] rounded-full p-3 mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                  <span className="text-sm font-medium text-[#4C0604] group-hover:text-white group-hover:font-semibold transition-colors duration-300">Join Our Network</span>
                 </div>
-                <span className="text-sm font-medium text-[#4C0604]">Join Our Network</span>
+                <div className="absolute inset-0 rounded-full border-4 border-transparent group-hover:border-[#4C0604] group-hover:border-opacity-30 transition-all duration-300 pointer-events-none"></div>
               </div>
             </div>
           </div>
           
           {/* View More Button */}
           <div className="text-center mt-16">
-            <button className="px-8 py-3 border-2 border-[#4C0604] text-[#4C0604] font-semibold rounded-full hover:bg-[#4C0604] hover:text-white transition-colors duration-300">
+            <button className="px-8 py-3 border-2 border-[#4C0604] text-[#4C0604] font-semibold rounded-full hover:bg-[#4C0604] hover:text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#4C0604] focus:ring-opacity-50">
               View All Alumni
             </button>
           </div>
